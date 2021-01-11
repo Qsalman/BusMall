@@ -1,110 +1,113 @@
 'use strict';
 
-function GenerateImage(name) {
-  this.name = name;
-  if (name === 'usb') {
-    this.ext = '.gif';
-  } else if (name === 'sweep') {
-    this.ext = '.png';
-  } else {
-    this.ext = '.jpg';
+var imgArray = ['bag.jpg','banana.jpg','bathroom.jpg','boots.jpg','breakfast.jpg','bubblegum.jpg','chair.jpg','cthulhu.jpg','dog-duck.jpg','dragon.jpg','pen.jpg','pet-sweep.jpg','scissors.jpg','shark.jpg','sweep.png','tauntaun.jpg','unicorn.jpg','usb.gif','water-can.jpg','wine-glass.jpg'];
+var nameArray = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
+var productArray = [];
+var totalClicks = 0;
+var img1 = document.getElementById ('left');
+var img2 = document.getElementById ('center');
+var img3 = document.getElementById ('right');
+var pictureList = [];
+
+function Products(itemName, itemPath) {
+  this.itemName = itemName;
+  this.itemPath = itemPath;
+  this.itemClick = 0;
+  this.imageShown = 0;
+  productArray.push(this);
+};
+for (var i = 0; i < imgArray.length; i++) {
+  var filePath = 'assets/' + imgArray[i];
+  console.log('assets/' + imgArray[i] );
+  new Products(nameArray[i], filePath);
+}
+function randomImgIndex() {
+  return Math.floor(Math.random() * imgArray.length);
+  console.log();
+}
+var prevImgIndexes = [];
+function randomImage() {
+  var currentImgIndexes = [];
+  while (currentImgIndexes.length < 3) {
+    var imgSelector = randomImgIndex();
+    //below is the secret sauce! this means if current AND previous ImgIndex are not the same or true (which they are) then run the randomImgIndex
+    if (!currentImgIndexes.includes(imgSelector) && !prevImgIndexes.includes(imgSelector)) {
+      currentImgIndexes.push(imgSelector);
+    }
   }
-  this.pathName = 'assets/' + this.name + this.ext;
-  this.clicked = 0;
-  this.viewed = 0;
-  GenerateImage.all.push(this);
-}
+  var prod1 = productArray[currentImgIndexes[0]];
+  var prod2 = productArray[currentImgIndexes[1]];
+  var prod3 = productArray[currentImgIndexes[2]];
+  console.log(currentImgIndexes);
+  img1.src = prod1.itemPath;
+  img2.src = prod2.itemPath;
+  img3.src = prod3.itemPath;
 
-GenerateImage.numberOfPicturesDisplayed = 3;
+  //i used index to collet the img indexes in order to count the number  of clicks
+  img1.index = currentImgIndexes[0];
+  img2.index = currentImgIndexes[1];
+  img3.index = currentImgIndexes[2];
 
-GenerateImage.maxClicks = 25;
+//turns current images to previous in order to get new images (and not repeat previous images).
+  prevImgIndexes = currentImgIndexes;
+  //increases image shows in incraments of 1
+  prod1.imageShown++;
+  prod2.imageShown++;
+  prod3.imageShown++;
+};
 
-GenerateImage.currentClicks = 0;
+randomImage();
 
-GenerateImage.imgElements = ['image_one', 'image_two', 'image_three'];
+var clickLimit = 25;
+function handleTheClick() { //self-exlpainatory
+  randomImage(); //run this function
+  totalClicks++; //incrament clicks up to 25, set below with event listener
+  var productIdx = this.index; //use index to pont to index in array in order to collect the instances the item was clicked
+  productArray[productIdx].itemClick++;
 
-GenerateImage.indicesUsed = [];
+  if (totalClicks === clickLimit) {
+    img1.removeEventListener('click', handleTheClick);
+    img2.removeEventListener('click', handleTheClick);
+    img3.removeEventListener('click', handleTheClick);
+    //stops the event listener once we reach 25 clicks
+    productClicks(); //this is defined below
+  }
+};
 
-GenerateImage.names = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum',
-  'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep',
-  'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
+img1.addEventListener('click', handleTheClick);
+img2.addEventListener('click', handleTheClick);
+img3.addEventListener('click', handleTheClick);
+//this calls the event listener and names the event 'click' and runs handleTheClick.
 
-GenerateImage.all = [];
+var voteTotals = [];
+function productClicks() {
+  for (var i = 0; i < productArray.length; i++) {
+    voteTotals.push(productArray[i].itemClick);
+  }
 
-for (var i = 0; i < GenerateImage.names.length; i++) {
-  new GenerateImage(GenerateImage.names[i]);
-}
+  var canvas = document.getElementById('chart');
+  var ctx = canvas.getContext('2d');
 
-// Handles clicking of images
-function handleClick(e) {
+  var data = {
+    labels: nameArray,
+    datasets: [{
+      label: 'Product Name',
+      data: voteTotals,
+      backgroundColor: 'orange'
+    }]
+  };
 
-  // Run this code only if there was an event
-  if (e) {
-    GenerateImage.currentClicks++;
-    for (var i = 0; i < GenerateImage.all.length; i++) {
-      if (e.target.alt === GenerateImage.all[i].name) {
-        GenerateImage.all[i].clicked++;
-        console.log('User clicked: ' + GenerateImage.all[i].name);
-        i = GenerateImage.all.length;
+  var myChart = new Chart(ctx, {
+    type: 'radar',
+    data: data,
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero:true
+          }
+        }]
       }
     }
-  }
-
-  // End if max clicks
-  if (GenerateImage.currentClicks >= 25) {
-    //Disable Event Listeners
-    for (i = 0; i < GenerateImage.imgElements.length; i++) {
-      document.getElementById(GenerateImage.imgElements[i]).removeEventListener('click', handleClick);
-      document.getElementById(GenerateImage.imgElements[i]).style.borderColor = 'black';
-      document.getElementById(GenerateImage.imgElements[i]).style.cursor = 'default';
-    }
-    //Display Data
-    for (i = 0; i < GenerateImage.all.length; i++) {
-      var percentage = Math.round((GenerateImage.all[i].clicked / GenerateImage.all[i].viewed) * 100);
-      if(GenerateImage.all[i].viewed === 0) {
-        percentage = 0;
-      }
-      var liElement = document.createElement('li');
-      liElement.textContent = GenerateImage.all[i].name + ' has been viewed ' +
-        GenerateImage.all[i].viewed + ' times and has been clicked ' +
-        GenerateImage.all[i].clicked + ' times.';
-      document.getElementById('results').appendChild(liElement);
-    }
-
-    return true;
-  }
-
-  // Display new images and collect data
-  for (i = 0; i < GenerateImage.numberOfPicturesDisplayed; i++) {
-    var random_number = Math.floor(Math.random() * GenerateImage.all.length);
-
-    console.log('Indices before render = ' + GenerateImage.indicesUsed);
-    console.log('random: ' + random_number);
-    // Make sure three previous images and current images are not duplicated
-    if (GenerateImage.indicesUsed.includes(random_number)) {
-      console.log('Duplicate found on image ' + i);
-      i--;
-    } else { // Display Image
-      document.getElementById(GenerateImage.imgElements[i]).src =
-        GenerateImage.all[random_number].pathName;
-      document.getElementById(GenerateImage.imgElements[i]).alt =
-        GenerateImage.all[random_number].name;
-      GenerateImage.all[random_number].viewed++;
-      GenerateImage.indicesUsed.push(random_number);
-      console.log('Indices after render = ' + GenerateImage.indicesUsed);
-    }
-  }
-
-  if (e) {
-    // Can now reuse the previous three images
-    GenerateImage.indicesUsed.shift();
-    GenerateImage.indicesUsed.shift();
-    GenerateImage.indicesUsed.shift();
-  }
+  });
 }
-
-for (i = 0; i < GenerateImage.imgElements.length; i++) {
-  document.getElementById(GenerateImage.imgElements[i]).addEventListener('click', handleClick);
-}
-
-handleClick();
