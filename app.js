@@ -8,6 +8,9 @@ var img1 = document.getElementById ('left');
 var img2 = document.getElementById ('center');
 var img3 = document.getElementById ('right');
 var pictureList = [];
+var imagesshowen =[];
+var arrayofclicks=[];
+
 
 function Products(itemName, itemPath) {
   this.itemName = itemName;
@@ -64,13 +67,19 @@ function randomImage() {
   prod1.imageShown++;
   prod2.imageShown++;
   prod3.imageShown++;
+
+  prod1.itemClick++;
+  prod2.itemClick++;
+  prod3.itemClick++;
+
+
 };
 
 randomImage();
 var clickLimit = 25;
 
 
-function handleTheClick() { //self-exlpainatory
+function handleTheClick() { 
   randomImage(); //run this function
   totalClicks++; //incrament clicks up to 25, set below with event listener
   var productIdx = this.index; //use index to pont to index in array in order to collect the instances the item was clicked
@@ -84,6 +93,16 @@ function handleTheClick() { //self-exlpainatory
     productClicks(); //this is defined below
   }
   // i put the json here so it will run wiht  handleTheClick so its track and store in pictureList array ==========================
+  
+  // ==========================================================================================================================
+
+  
+  for (var index=0;index<imgArray.length;index++)  {
+    imagesshowen.push (productArray[index].imageShown);
+   
+  }
+// ==========================================================================================================================
+
   localStorage.pictureList = JSON.stringify(productArray);
 };
 
@@ -93,11 +112,12 @@ img3.addEventListener('click', handleTheClick);
 //this calls the event listener and names the event 'click' and runs handleTheClick.
 
 var voteTotals = [];
-
+var shoenimgaestotal =[];
 
 function productClicks() {
   for (var i = 0; i < productArray.length; i++) {
     voteTotals.push(productArray[i].itemClick);
+    shoenimgaestotal.push(productArray[i].imageShown);
   }
 
   var canvas = document.getElementById('chart');
@@ -108,9 +128,13 @@ function productClicks() {
       label: 'Product Name',
       data: voteTotals,
       backgroundColor: 'red'
-    }]
+    },{
+      label: 'imges shown',
+      data: shoenimgaestotal,
+      backgroundColor: 'blue'
+    }
+  ]
   };
-
   var myChart = new Chart(ctx, {
     type: 'bar',
     data: data,
@@ -125,3 +149,4 @@ function productClicks() {
     }
   });
 }
+
