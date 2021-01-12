@@ -109,6 +109,8 @@ function handleTheClick() {
 img1.addEventListener('click', handleTheClick);
 img2.addEventListener('click', handleTheClick);
 img3.addEventListener('click', handleTheClick);
+
+
 //this calls the event listener and names the event 'click' and runs handleTheClick.
 
 var voteTotals = [];
