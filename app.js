@@ -21,6 +21,16 @@ for (var i = 0; i < imgArray.length; i++) {
   console.log('assets/' + imgArray[i] );
   new Products(nameArray[i], filePath);
 }
+// creating a localstorage  =======================================================
+if (localStorage.pictureList) {
+  var storageArray = JSON.parse(localStorage.pictureList);
+  for (var i = 0; i < storageArray.length; i++) {
+    productArray[i].itemClick = productArray[i].itemClick+storageArray[i].itemClick;
+    productArray[i].imageShown = productArray[i].imageShown+storageArray[i].imageShown;
+  }
+}
+
+
 function randomImgIndex() {
   return Math.floor(Math.random() * imgArray.length);
   console.log();
@@ -30,7 +40,7 @@ function randomImage() {
   var currentImgIndexes = [];
   while (currentImgIndexes.length < 3) {
     var imgSelector = randomImgIndex();
-    //below is the secret sauce! this means if current AND previous ImgIndex are not the same or true (which they are) then run the randomImgIndex
+    //below this means if current AND previous ImgIndex are not the same or true (which they are) then run the randomImgIndex
     if (!currentImgIndexes.includes(imgSelector) && !prevImgIndexes.includes(imgSelector)) {
       currentImgIndexes.push(imgSelector);
     }
@@ -57,8 +67,9 @@ function randomImage() {
 };
 
 randomImage();
-
 var clickLimit = 25;
+
+
 function handleTheClick() { //self-exlpainatory
   randomImage(); //run this function
   totalClicks++; //incrament clicks up to 25, set below with event listener
@@ -72,6 +83,8 @@ function handleTheClick() { //self-exlpainatory
     //stops the event listener once we reach 25 clicks
     productClicks(); //this is defined below
   }
+  // i put the json here so it will run wiht  handleTheClick so its track and store in pictureList array ==========================
+  localStorage.pictureList = JSON.stringify(productArray);
 };
 
 img1.addEventListener('click', handleTheClick);
@@ -80,6 +93,8 @@ img3.addEventListener('click', handleTheClick);
 //this calls the event listener and names the event 'click' and runs handleTheClick.
 
 var voteTotals = [];
+
+
 function productClicks() {
   for (var i = 0; i < productArray.length; i++) {
     voteTotals.push(productArray[i].itemClick);
@@ -87,18 +102,17 @@ function productClicks() {
 
   var canvas = document.getElementById('chart');
   var ctx = canvas.getContext('2d');
-
   var data = {
     labels: nameArray,
     datasets: [{
       label: 'Product Name',
       data: voteTotals,
-      backgroundColor: 'orange'
+      backgroundColor: 'red'
     }]
   };
 
   var myChart = new Chart(ctx, {
-    type: 'radar',
+    type: 'bar',
     data: data,
     options: {
       scales: {

@@ -1,10 +1,14 @@
 body{
-
-background-color: rgba(252, 232, 236, 0.466);
+    background-color: rgba(198, 230, 19, 0.466);
+    
+       background-image: linear-gradient(rgba(255,255,255,0.75),rgba(255,255,255,0.75)), url('https://codetheweb.blog/assets/img/posts/steps-to-creating-a-website/field.jpg');
+    
+      background-color: #f50000;
+     
 }
 img {
   float:left;
-  border: dotted thin gray;
+  border: dotted  rgb(243, 1, 1);
   margin: 20px;
   height: 200px;
   width: 200px;
@@ -18,7 +22,7 @@ h1 {
 }
 
 p {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Audiowide", sans-serif;
   clear: left;
   margin: 20px;
 }
